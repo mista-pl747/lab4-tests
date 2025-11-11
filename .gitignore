@@ -1,0 +1,78 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+*.pyo.d
+*.pyproj
+*.egg
+*.egg-info/
+dist/
+build/
+*.egg
+*.manifest
+*.spec
+*.log
+*.sqlite3
+*.db
+
+# Віртуальне середовище
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Pytest
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+.coverage.*
+
+# === Node.js / Cypress ===
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Cypress
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
+cypress.env.json
+cypress.config.js
+
+# === IDE / Editors ===
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.suo
+*.sw?
+
+# === OS ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Secrets ===
+.env
+.env.local
+.secrets
+config.json
+*.key
+*.pem
+
+# === Reports ===
+reports/
+*.html
+*.xml
+*.json
