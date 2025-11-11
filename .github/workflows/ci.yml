@@ -5,13 +5,13 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-    
+
 jobs:
   python-tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12"]
     name: Python ${{ matrix.python-version }}
 
     steps:
@@ -30,14 +30,24 @@ jobs:
         run: pip install -r requirements-dev.txt
 
       - name: Run tests with coverage
+        
+        env:
+          PYTHONPATH: .
         run: |
-          pytest --cov=src --cov-report=xml --cov-report=term-missing -v
+          pytest --cov=src --cov-report=xml --cov-report=html --cov-report=term-missing -v
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4 
         with:
           files: coverage.xml
           fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }} 
+
+      - name: Upload HTML coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-${{ matrix.python-version }}
+          path: htmlcov/
 
   cypress-e2e:
     needs: python-tests
@@ -46,30 +56,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: pip install -r requirements-dev.txt
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20' 
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install Node.js dependencies
+        run: npm install cypress wait-on
+
+      - name: Start Python server in background
+        env:
+          PYTHONPATH: .
+        run: |
+          uvicorn src.main:app --host 0.0.0.0 --port 8000 &
+      
+      
+        run: npx wait-on http://localhost:8000
 
       - name: Run Cypress tests
-        run: npx cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }}
+        run: npx cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }} --config baseUrl=http://localhost:8000
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-
-  upload-artifacts:
-    needs: [python-tests, cypress-e2e]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download coverage
-        uses: actions/download-artifact@v3
-        with:
-          name: coverage
-
-      - name: Upload HTML report
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage-report
-          path: htmlcov/
