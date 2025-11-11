@@ -77,11 +77,10 @@ jobs:
           PYTHONPATH: .
         run: |
           uvicorn src.api.products:app --host 0.0.0.0 --port 8000 &
-      
-      - name: Wait for server to be ready
-        run:
           sleep 3
-          npx wait-on http://127.0.0.1:8000
+
+      - name: Wait for server to be ready
+        run: npx wait-on http-get://127.0.0.1:8000 --timeout 60000
 
       - name: Run Cypress tests
         run: npx cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }} --config baseUrl=http://127.0.0.1:8000
