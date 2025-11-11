@@ -46,7 +46,6 @@ cypress/screenshots/
 cypress/videos/
 cypress/downloads/
 cypress.env.json
-cypress.config.js
 
 # === IDE / Editors ===
 .idea/
